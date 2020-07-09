@@ -157,7 +157,7 @@ def login():
 
     oidc_login = FlaskOIDCLogin(flask_request, tool_conf, launch_data_storage=launch_data_storage)
     return oidc_login\
-        .enable_check_cookies()\
+        .disable_check_cookies()\
         .redirect(target_link_uri)
 
 
