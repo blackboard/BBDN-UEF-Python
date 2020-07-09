@@ -209,13 +209,7 @@ def authcode():
 
     login_user(User(uuid))
 
-    tp_kwargs = {
-        'title' : PAGE_TITLE,
-        'learn_url' : 'https://' + Config.config['learn_rest_url'],
-        'token' : token
-    }
-
-    return render_template('index.html', **tp_kwargs)
+    return render_template('helloworld.html')
 
 if __name__ == '__main__':
     restAuthController = None
