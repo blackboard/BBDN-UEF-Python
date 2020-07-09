@@ -209,7 +209,7 @@ def authcode():
 
     login_user(User(uuid))
 
-    return render_template('helloworld.html')
+    return render_template('index.html', title=PAGE_TITLE)
 
 if __name__ == '__main__':
     restAuthController = None
