@@ -157,7 +157,7 @@ def login():
 
     oidc_login = FlaskOIDCLogin(flask_request, tool_conf, launch_data_storage=launch_data_storage)
     return oidc_login\
-        .disable_check_cookies()\
+        .enable_check_cookies()\
         .redirect(target_link_uri)
 
 
@@ -211,7 +211,7 @@ def authcode():
 
     tp_kwargs = {
         'title' : PAGE_TITLE,
-        'learn_url' : Config.config['learn_rest_url'],
+        'learn_url' : 'https://' + Config.config['learn_rest_url'],
         'token' : token
     }
 
