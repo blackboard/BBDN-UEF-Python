@@ -94,7 +94,7 @@ function onMessageFromUltra(message) {
             ) {                                 
 
                 if(message.data.routeData.courseId === course_id && message.data.routeData.id === content_id) {
-
+                    
                     localStorage.setItem('coursesOrOrganizations', message.data.routeData.coursesOrOrganizations);
 
                     // So let's ask Ultra to open a panel
@@ -153,7 +153,7 @@ function renderPanelContents(message) {
     // Is this our panel??
     if (message.data.correlationId === 'panel-1') {
         
-        panel_url = panel_url + '?coursesOrOrganizations=' + localStorage.getItem(coursesOrOrganizations)
+        panel_url = panel_url + '?coursesOrOrganizations=' + localStorage.getItem('coursesOrOrganizations')
 
         // let's get our panel ID
         panelId = message.data.portalId;
