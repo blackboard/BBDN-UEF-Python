@@ -80,6 +80,51 @@ function onMessageFromUltra(message) {
       onAuthorizedWithUltra();
     }
 
+    // Check to see if we received an Event...
+    if (message.data.type === 'event:event') {
+        
+        // From here, you can do something with those events. Let's check for a click..
+        if(message.data.eventType === 'route') {
+  
+            if ( message.data.routeName === 'base.admin.peek.course.outline.peek.content-manage.edit.document' ||
+                 message.data.routeName === 'base.courses.peek.course.outline.peek.content-manage.edit.document'
+            ) {                                 
+
+                if(message.data.routeData.courseId === course_id && message.data.routeData.id === content_id) {
+
+                    // So let's ask Ultra to open a panel
+                    setTimeout(() => {
+                        messageChannel.postMessage({
+                            type: 'portal:panel',
+                            correlationId: 'panel-1',
+                            panelType: 'small',
+                            panelTitle: 'Hello World',
+                            attributes: {
+                                onClose: {
+                                    callbackId: 'panel-1-close',
+                                },
+                                onClick: {
+                                    callbackId: 'panel-1-close',
+                                },
+                            },
+                        });
+                    }, 2000);
+                }
+
+            }
+
+        }
+
+    }
+
+    // Ultra has responded to our request to open a new panel...
+    if (message.data.type === 'portal:panel:response') {
+    
+        // That means we have an iframe. Let's render our content there.
+        renderPanelContents(message);
+    
+    }
+
 }
 
 /*
@@ -92,6 +137,50 @@ function onAuthorizedWithUltra() {
         type: 'event:subscribe',
         subscriptions: ['click','hover','route','portal:new','portal:remove'],
     });
+
+}
+
+/*
+ * This is the function that renders our content in the iFrame that Ultra gives us
+ */
+function renderPanelContents(message) {
+    
+    // Is this our panel??
+    if (message.data.correlationId === 'panel-1') {
+        
+        // let's get our panel ID
+        panelId = message.data.portalId;
+      
+        // Now we will tell Ultra we want to render our content in the iframe they opened for us.
+        // panel_url is set in index.html
+        messageChannel.postMessage({
+            type: 'portal:render',
+            portalId: message.data.portalId,
+            contents: {
+                tag: 'span',
+                props: {
+                    style: {
+                        display: 'flex',
+                        height: '100%',
+                        width: '100%',
+                        flexDirection: 'column',
+                        alignItems: 'stretch',
+                        justifyContent: 'stretch',
+                    },
+                },
+                children: [{
+                    tag: 'iframe',
+                    props: {
+                        style: {
+                            flex: '1 1 auto',
+                        },
+                        src: panel_url,
+                    },
+                }]
+            },
+        });
+
+    }
 
 }
 

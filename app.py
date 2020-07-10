@@ -212,10 +212,18 @@ def authcode():
     tp_kwargs = {
         'title' : PAGE_TITLE,
         'learn_url' : 'https://' + Config.config['learn_rest_url'],
-        'token' : token
+        'token' : token,
+        'panel_url' : Config.config['app_url'] + '/helloworld/',
+        'course_id' : '_47_1',
+        'content_id' : '_947_1'
     }
 
     return render_template('index.html', **tp_kwargs)
+
+@app.route('/helloworld/', methods=['GET', 'POST'])
+@login_required
+def sayhello():
+    return render_template('helloworld.html')
 
 if __name__ == '__main__':
     restAuthController = None
