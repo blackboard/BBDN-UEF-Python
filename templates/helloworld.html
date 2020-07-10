@@ -16,19 +16,5 @@
     <p>
       Welcome to the Ultra Extension Framework Python demo!
     </p>
-
-    <p>coursesOrOrganizations is {{ coursesOrOrganizations }}</p>
-
-    <button onClick="closePanel()">Close Panel</button>
-
-    <script>
-        function closePanel() {
-            value = {
-                type: 'portal:panel:close'
-            }
-            
-            window.localStorage.setItem('event', JSON.stringify(value));
-        };
-    </script>
 </body>
 </html>

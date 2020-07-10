@@ -223,9 +223,7 @@ def authcode():
 @app.route('/helloworld/', methods=['GET', 'POST'])
 @login_required
 def sayhello():
-    coursesOrOrganizations = request.args.get('coursesOrOrganizations', 'No coursesOrOrganizations Specified')
-
-    return render_template('helloworld.html', coursesOrOrganizations=coursesOrOrganizations)
+    return render_template('helloworld.html')
 
 if __name__ == '__main__':
     restAuthController = None
