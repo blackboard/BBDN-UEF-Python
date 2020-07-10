@@ -35,6 +35,9 @@ if (!window.parent) {
 /* Initialize messageChannel */
 let messageChannel;
 
+// Initialize panelId. This is used to keep track of our open panels between functions
+let panelId
+
 /* Add an event listener to listen for messages. When one is received, call onPostMessageReceived() */
 window.addEventListener("message", onPostMessageReceived, false);
 
@@ -92,6 +95,8 @@ function onMessageFromUltra(message) {
 
                 if(message.data.routeData.courseId === course_id && message.data.routeData.id === content_id) {
 
+                    localStorage.setItem('coursesOrOrganizations', message.data.routeData.coursesOrOrganizations);
+
                     // So let's ask Ultra to open a panel
                     setTimeout(() => {
                         messageChannel.postMessage({
@@ -148,6 +153,8 @@ function renderPanelContents(message) {
     // Is this our panel??
     if (message.data.correlationId === 'panel-1') {
         
+        panel_url = panel_url + '?coursesOrOrganizations=' + localStorage.getItem(coursesOrOrganizations)
+
         // let's get our panel ID
         panelId = message.data.portalId;
       
@@ -181,6 +188,45 @@ function renderPanelContents(message) {
         });
 
     }
+
+}
+
+// Set up local storage to allow our application to talk to our Ultra iframe, pass messages to onEventFromIframe()
+window.addEventListener('storage', onEventFromIframe);
+
+/* 
+ * This function receives messages from elsewhere within our application.
+ * It can also be used to save data between functions, like context information from a route change to be
+ * used in a different function
+ */ 
+function onEventFromIframe(evt) {
+
+    // In our implementation, we are only listening to events
+    if (evt.key !== 'event') {
+        return;
+    }
+  
+    // sace the event value as message
+    const message = JSON.parse(evt.newValue);
+
+    // Check if this event is something we care about
+    switch (message.type) {
+
+        // This event is triggered when you click the 'close panel' button in our helloworld.html
+        case 'portal:panel:close':
+
+            // Ask Ultra to close our panel, associated with the panelId
+            messageChannel.postMessage({
+                type: 'portal:panel:close',
+                id: panelId,
+            });
+            break;
+
+    }
+
+    // Chrome keeps local storage between logins, so we remove it here, otherwise our event listener
+    // won't recognize any close panel clicks after the first one
+    localStorage.removeItem(evt.key);
 
 }
 
