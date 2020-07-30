@@ -132,6 +132,10 @@ def load_user(user_id):
         return User(user_id)
     return None
 
+@app.route('/', methods=['GET'])
+def test():
+    return('<h1>Your docker container is sucessfully being served by ngrok from your desktop!</h1>')
+
 @app.route('/jwks/', methods=['GET'])
 def get_jwks():
     tool_conf = ToolConfJsonFile(get_lti_config_path())
@@ -184,7 +188,7 @@ def launch():
 
     get_authcode_url = learn_url + '/learn/api/public/v1/oauth2/authorizationcode?' + encodedParams
 
-    print("authcode_URL: " + get_authcode_url)
+    print("authcode_URL: " + get_authcode_url, flush=True)
 
     return(redirect(get_authcode_url))
 
@@ -193,7 +197,7 @@ def authcode():
     
     authcode = request.args.get('code', '')
     state = request.args.get('state', '')
-    print (authcode)
+    print (authcode, flush=True)
     
     restAuthController = RestAuthController.RestAuthController(authcode)
     restAuthController.setToken()
