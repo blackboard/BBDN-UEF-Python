@@ -82,13 +82,6 @@ class User(UserMixin):
 
     def __init__(self, user_id):
         self.id = user_id
-        self.email = None
-        
-    def getEmail(self):
-        return self.email
-    
-    def setEmail(self, email):
-        self.email = email
 
 class ExtendedFlaskMessageLaunch(FlaskMessageLaunch):
 
@@ -213,5 +206,4 @@ def authcode():
 
 if __name__ == '__main__':
     restAuthController = None
-    port = int(os.environ.get('PORT', 33507))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=5000)
