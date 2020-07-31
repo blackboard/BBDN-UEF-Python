@@ -108,7 +108,9 @@ dmypy.json
 .pyre/
 
 # End of https://www.gitignore.io/api/python
-#configs
+Config.py
+lti.json
+private.key
 
 
 *.zip
