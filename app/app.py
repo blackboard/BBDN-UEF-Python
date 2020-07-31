@@ -139,6 +139,10 @@ def load_user(user_id):
         return User(user_id)
     return None
 
+@app.route('/', methods=['GET'])
+def test():
+    return('<h1>Your docker container is sucessfully being served by ngrok from your desktop!</h1>')
+
 @app.route('/jwks/', methods=['GET'])
 def get_jwks():
     tool_conf = ToolConfJsonFile(get_lti_config_path())
