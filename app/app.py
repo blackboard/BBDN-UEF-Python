@@ -220,7 +220,7 @@ def authcode():
         'token' : token,
         'panel_url' : Config.config['app_url'] + '/helloworld/',
         'course_id' : '_47_1',
-        'content_id' : '_1254_1'
+        'content_id' : '_1256_1'
     }
 
     return render_template('index.html', **tp_kwargs)
