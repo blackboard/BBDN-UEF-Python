@@ -139,6 +139,11 @@ def load_user(user_id):
         return User(user_id)
     return None
 
+@app.route('/', methods=['GET'])
+def test():
+    return('<h1>Your docker container is sucessfully being served by ngrok from your desktop!</h1>')
+
+
 @app.route('/jwks/', methods=['GET'])
 def get_jwks():
     tool_conf = ToolConfJsonFile(get_lti_config_path())
@@ -215,7 +220,7 @@ def authcode():
         'token' : token,
         'panel_url' : Config.config['app_url'] + '/helloworld/',
         'course_id' : '_47_1',
-        'content_id' : '_947_1'
+        'content_id' : '_1254_1'
     }
 
     return render_template('index.html', **tp_kwargs)
@@ -227,5 +232,4 @@ def sayhello():
 
 if __name__ == '__main__':
     restAuthController = None
-    port = int(os.environ.get('PORT', 33507))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=5000)
