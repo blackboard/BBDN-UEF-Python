@@ -6,7 +6,7 @@ To configure:
 
 ## configs/lti.json and configs/private.key
 
-This [document](https://docs.blackboard.com/standards/PyLTI1p3WithBlackboardLearn.html) shows how to configure the PyLTI1.3 library, which is done through the `configs`directory.
+This [document](https://docs.blackboard.com/standards/lti/tutorials/py-lti-1p3) shows how to configure the PyLTI1.3 library, which is done through the `configs`directory.
 
 ## ConfigTemplate.py
 
