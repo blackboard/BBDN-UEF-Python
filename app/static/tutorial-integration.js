@@ -85,14 +85,21 @@ function onMessageFromUltra(message) {
 
     // Check to see if we received an Event...
     if (message.data.type === 'event:event') {
-        
+        console.log('TUTORIAL got event')
+        console.log('TUTORIAL (route?) message.data.eventType:', message.data.eventType)
         // From here, you can do something with those events. Let's check for a click..
         if(message.data.eventType === 'route') {
-  
+            // Added this logging because UEF has added/changed routeName for user action in the past.
+            console.log('LOOKING FOR base.admin.peek.course.outline.peek.content-manage.edit.document')
+            console.log('LOOKING FOR base.courses.peek.course.outline.peek.content-manage.edit.document')
+            console.log('LOOKING FOR base.recentActivity.peek.course.outline.peek.content-manage.edit.document')
+            console.log('TUTORIAL GOT A ROUTE routeName', message.data.routeName)
             if ( message.data.routeName === 'base.admin.peek.course.outline.peek.content-manage.edit.document' ||
-                 message.data.routeName === 'base.courses.peek.course.outline.peek.content-manage.edit.document'
+                 message.data.routeName === 'base.courses.peek.course.outline.peek.content-manage.edit.document' ||
+                 message.data.routeName === 'base.recentActivity.peek.course.outline.peek.content-manage.edit.document'
             ) {                                 
-
+                console.log('TUTORIAL message.data.routeData.courseId:', message.data.routeData.courseId)
+                console.log('TUTORIAL message.data.routeData.id:',message.data.routeData.id)
                 if(message.data.routeData.courseId === course_id && message.data.routeData.id === content_id) {
                     
                     // So let's ask Ultra to open a panel
@@ -135,7 +142,7 @@ function onMessageFromUltra(message) {
  * and specifies the events we want to listen for
  */
 function onAuthorizedWithUltra() {
-  
+    console.log('tutorial successful authorization')
     messageChannel.postMessage({
         type: 'event:subscribe',
         subscriptions: ['click','hover','route','portal:new','portal:remove'],
@@ -202,12 +209,12 @@ class LoggedMessageChannel {
     }
   
     onMessage = (evt) => {
-        console.log(`[UEF] From Learn Ultra:`, evt.data);
+        console.log(`[UEF] FROM Learn Ultra:`, evt.data);
         this.onmessage(evt);
     };
   
     postMessage = (msg) => {
-        console.log(`[UEF] To Learn Ultra`, msg);
+        console.log(`[UEF] TO Learn Ultra`, msg);
         this.messageChannel.postMessage(msg);
     }
 
