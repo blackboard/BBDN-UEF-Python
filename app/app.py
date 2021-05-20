@@ -219,8 +219,8 @@ def authcode():
         'learn_url' : 'https://' + Config.config['learn_rest_url'],
         'token' : token,
         'panel_url' : Config.config['app_url'] + '/helloworld/',
-        'course_id' : '_47_1',
-        'content_id' : '_1256_1'
+        'course_id' : '_3_1',
+        'content_id' : '_60_1'
     }
 
     return render_template('index.html', **tp_kwargs)
