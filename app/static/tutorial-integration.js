@@ -73,6 +73,17 @@ function onPostMessageReceived(evt) {
   
 }
 
+// called when our onMessageFromUltra message is in response to our proctoring service registration recieved.
+const onProctoringServiceRegister = (msg) => {
+    const proctoringServiceHandle = msg.data.proctoringPlacementHandle;
+    const errorMsg = msg.data.errorMessage;
+    console.log(`[UEF Tutorial] ${proctoringServiceHandle} registration response: ${msg.data.status}`);
+
+    if (errorMsg) {
+        console.log('errorMessage: ', msg.data.errorMessage);
+    }
+}
+
 /*
  * Called when our message processor receives amessage from Ultra. 
  */
@@ -82,6 +93,12 @@ function onMessageFromUltra(message) {
     if (message.data.type === 'authorization:authorize') {
       onAuthorizedWithUltra();
     }
+
+    // Check if our proctoring service registration was recieved.
+    if (message.data.type === 'proctoring-service:register') {
+        console.log('UEF TUTORIAL got proctoring-service:register message.')
+        onProctoringServiceRegister(message)
+    }    
 
     // Check to see if we received an Event...
     if (message.data.type === 'event:event') {
@@ -143,6 +160,12 @@ function onMessageFromUltra(message) {
  */
 function onAuthorizedWithUltra() {
     console.log('TUTORIAL successful authorization')
+
+    messageChannel.postMessage({
+        type: 'proctoring-service:register',
+        proctoringPlacementHandle: 'f74b87c285bb452685566123cb936b07'
+    });
+
     messageChannel.postMessage({
         type: 'event:subscribe',
         subscriptions: ['click','hover','route','portal:new','portal:remove'],
