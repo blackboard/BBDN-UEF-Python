@@ -73,7 +73,7 @@ function onPostMessageReceived(evt) {
   
 }
 
-// called when our onMessageFromUltra message is in response to our proctoring service registration recieved.
+// PROCTORING: called when our onMessageFromUltra message is in response to our proctoring service registration recieved.
 const onProctoringServiceRegister = (msg) => {
     const proctoringServiceHandle = msg.data.proctoringPlacementHandle;
     const errorMsg = msg.data.errorMessage;
@@ -94,7 +94,7 @@ function onMessageFromUltra(message) {
       onAuthorizedWithUltra();
     }
 
-    // Check if our proctoring service registration was recieved.
+    // PROCTORING: Check if our proctoring service registration was recieved.
     if (message.data.type === 'proctoring-service:register') {
         console.log('UEF TUTORIAL got proctoring-service:register message.')
         onProctoringServiceRegister(message)
@@ -140,9 +140,41 @@ function onMessageFromUltra(message) {
 
             }
 
-        }
+        } // END if(message.data.eventType === 'route') {
 
-    }
+        // PROCTORING: The event type is a new portal. Proctoring data is shown in a "portal"
+        if (message.data.eventType === 'portal:new') {
+            
+            // Check if this matches the proctoring panel selector
+            if (message.data.selector === 'course.content.assessment.settings.proctoring.panel.settings') {
+                
+                // ID of this portal. This must be sent back to UEF in the portal:render message
+                const portalId = message.data.portalId;
+                    
+                // contentId is included for convience in the selectorData
+                console.log(message.data.selectorData.contentId);
+                    
+                const contentsToSend = {
+                    tag: 'div',
+                    children: [{
+                        tag: 'div',
+                        children: `Proctoring Service Settings`
+                    }, {
+                        tag: 'div',
+                        children:  `CourseID: ${message.data.selectorData.contentId}`
+                    }]
+                };
+        
+                // Send message to UEF to render this content
+                messageChannel.postMessage({
+                    type: "portal:render",
+                    portalId: portalId,
+                    contents: contentsToSend
+                });
+            } // END if (msg.data.selector === 'course.content.assessment.settings.proctoring.panel.settings') {
+        } // END if (message.data.eventType === 'portal:new') {
+
+    } // END if (message.data.type === 'event:event') {
 
     // Ultra has responded to our request to open a new panel...
     if (message.data.type === 'portal:panel:response') {
@@ -152,6 +184,24 @@ function onMessageFromUltra(message) {
     
     }
 
+    // PROCTORING: TODO: Add code to save off our settings...
+    if (message.data.type === 'proctoring-service:settings-saved') {
+        // Settings were saved for this contentId
+        console.log(message.data.contentId);
+         
+        // Status of proctoring
+        console.log(message.data.enabled);
+      
+      
+        // Your response back to UEF after you have done what you need to
+        messageChannel.postMessage({
+           type: 'proctoring-service:settings-saved:response',
+           correlationId: msg.data.correlationId,
+           success: true,
+           error: undefined
+        });
+     }
+
 }
 
 /*
@@ -160,7 +210,9 @@ function onMessageFromUltra(message) {
  */
 function onAuthorizedWithUltra() {
     console.log('TUTORIAL successful authorization')
+    console.log('window.location.origin:', window.location.origin)
 
+    // PROCTORING - register our LTI Tool with the UEF.
     messageChannel.postMessage({
         type: 'proctoring-service:register',
         proctoringPlacementHandle: 'f74b87c285bb452685566123cb936b07'
