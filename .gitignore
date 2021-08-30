@@ -111,6 +111,6 @@ dmypy.json
 Config.py
 lti.json
 private.key
-
+public.key
 
 *.zip
