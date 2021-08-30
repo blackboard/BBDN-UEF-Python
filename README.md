@@ -6,7 +6,7 @@ To configure:
 
 ## app/Config.py, app/lti.json, app/private.key, and app/public.key
 
-The source project for this project, here [document](https://docs.blackboard.com/standards/lti/tutorials/py-lti-1p3) shows how to configure the PyLTI1.3 library, which is done through it's `configs`directory. This project has no `configs` directory. Instead, everthing in the `app` directory.
+The source project for this project, [tutorials/py-lti-1p3](https://docs.blackboard.com/standards/lti/tutorials/py-lti-1p3) shows how to configure the PyLTI1.3 library, which is done through it's `configs`directory. This project has no `configs` directory. Instead, all configuration is in files in the `app` directory.
 
 ## ConfigTemplate.py
 
