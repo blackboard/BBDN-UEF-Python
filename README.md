@@ -1,6 +1,6 @@
 # BBDN-UEF-Python
 
-This project is set up to demonstrate the use of the Ultra Extension Framework with LTI 1.3 in Python.
+This project is set up to demonstrate the use of the Ultra Extension Framework with LTI 1.3 in Python. Start on the master branch. If you don't see the template files, you need to begin with the master branch and work thorough each branch as described in this tutorial: https://docs.blackboard.com/learn/uef/lti-to-uef-tutorial  
 
 To configure:
 
