@@ -85,13 +85,21 @@ function onMessageFromUltra(message) {
 
     // Check to see if we received an Event...
     if (message.data.type === 'event:event') {
-        
+        console.log('[UEF TUTORIAL] got event')
+        console.log('[UEF TUTORIAL] (route?) message.data.eventType:', message.data.eventType)
         // From here, you can do something with those events. Let's check for a click..
         if(message.data.eventType === 'route') {
-  
+            // Added this logging because UEF has added/changed routeName for user action in the past.
+            console.log('[UEF TUTORIAL] Looking for base.admin.peek.course.outline.peek.content-manage.edit.document')
+            console.log('[UEF TUTORIAL] Looking for base.courses.peek.course.outline.peek.content-manage.edit.document')
+            console.log('[UEF TUTORIAL] Looking for base.recentActivity.peek.course.outline.peek.content-manage.edit.document')
+            console.log('[UEF TUTORIAL] Got routeName', message.data.routeName)
             if ( message.data.routeName === 'base.admin.peek.course.outline.peek.content-manage.edit.document' ||
-                 message.data.routeName === 'base.courses.peek.course.outline.peek.content-manage.edit.document'
+                 message.data.routeName === 'base.courses.peek.course.outline.peek.content-manage.edit.document' ||
+                 message.data.routeName === 'base.recentActivity.peek.course.outline.peek.content-manage.edit.document'
             ) {                                 
+                console.log('[UEF TUTORIAL] message.data.routeData.courseId:', message.data.routeData.courseId)
+                console.log('[UEF TUTORIAL] message.data.routeData.id:',message.data.routeData.id)                       
 
                 if(message.data.routeData.courseId === course_id && message.data.routeData.id === content_id) {
                     
@@ -200,7 +208,7 @@ window.addEventListener('storage', onEventFromIframe);
  * used in a different function
  */ 
 function onEventFromIframe(evt) {
-
+    console.log('got event from iframe', evt.key)
     // In our implementation, we are only listening to events
     if (evt.key !== 'event') {
         return;

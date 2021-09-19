@@ -23,7 +23,8 @@ config = {
 ```
 
 * **learn_rest_url** should be set to your learn instances domain. Be sure to AVOID the request scheme, i.e. `mylearn.blackboard.edu`
-* **app_url** should be set to the FQDN of your application, i.e. `https://myapp.herokuapp.com`
+* **app_url** should be set to the URL of your application, i.e. `https://myapp.herokuapp.com`
+NOTE: The following are not yet implemented. course id and content id for the panel is hard-coded in app.py authcode route. You have to set yours there.
 * **courses** maps the course Pk1 to the title you wish to to assign it
 * **courseIds** is a comma-delimeted list of course ids to listen for events from
 * **contents** maps content pk1 values to the title you wish to assign it
