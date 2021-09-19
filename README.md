@@ -22,8 +22,10 @@ config = {
 }
 ```
 
-* **learn_rest_url** should be set to your learn instances domain. Be sure to AVOID the request scheme, i.e. `mylearn.blackboard.edu`
+* **learn_rest_url** should be set to your learn instances domain. Do NOT include the the request scheme, i.e. use something like `mylearn.blackboard.edu`
 * **app_url** should be set to the FQDN of your application, i.e. `https://myapp.herokuapp.com`
+NOTE: The following are not yet implemented. For the Panel demonstration the title, course id, and content id are hard-coded in the authcode route.
+You WILL HAVE TO make not of your document's course id and content id and code those into app.py.
 * **courses** maps the course Pk1 to the title you wish to to assign it
 * **courseIds** is a comma-delimeted list of course ids to listen for events from
 * **contents** maps content pk1 values to the title you wish to assign it
