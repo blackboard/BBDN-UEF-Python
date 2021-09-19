@@ -183,12 +183,21 @@ def launch():
     
     learn_url = message_launch_data['https://purl.imsglobal.org/spec/lti/claim/tool_platform']['url'].rstrip('/')
 
+    # Rererence: https://docs.blackboard.com/blog/2021/05/10/use-one-time-session-tokens-instead-of-cookies-for-UEF-authentication.html
+    # Get the value of the one time session token from the LTI claim
+    one_time_session_token  = message_launch_data['https://blackboard.com/lti/claim/one_time_session_token']
+
+    # If there is no comma in the value, we've hit the bug. Add it and the user's UUID
+    if "," not in one_time_session_token:
+        one_time_session_token += "," + message_launch_data['sub']
+
     params = {
         'redirect_uri' : Config.config['app_url'] + '/authcode/',
         'response_type' : 'code',
         'client_id' : Config.config['learn_rest_key'],
         'scope' : '*',
-        'state' : str(uuid.uuid4())
+        'state' : str(uuid.uuid4()),
+	    'one_time_session_token' : one_time_session_token
     }
 
     encodedParams = urllib.parse.urlencode(params)
