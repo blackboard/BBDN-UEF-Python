@@ -35,6 +35,9 @@ if (!window.parent) {
 /* Initialize messageChannel */
 let messageChannel;
 
+var integrationHost = window.location.protocol + "//" + window.location.hostname
+    + (window.location.port === "" ? "" : (":" + window.location.port));
+
 // Initialize panelId. This is used to keep track of our open panels between functions
 let panelId
 
@@ -177,6 +180,32 @@ function onMessageFromUltra(message) {
             } // END if (msg.data.selector === 'course.content.assessment.settings.proctoring.panel.settings') {
         } // END if (message.data.eventType === 'portal:new') {
 
+        if (message.data.eventType === 'help:request') {
+                // Ignore default help request from Ultra
+                messageChannel.postMessage({
+                    type: 'help:request:response',
+                    correlationId: message.data.correlationId
+                });
+                // Let's ask Ultra to open a panel
+                setTimeout(() => {
+                    messageChannel.postMessage({
+                        type: 'portal:panel',
+                        correlationId: 'panel-1',
+                        panelType: 'small',
+                        panelTitle: 'Hello World',
+                        attributes: {
+                            onClose: {
+                                callbackId: 'panel-1-close',
+                            },
+                            onClick: {
+                                callbackId: 'panel-1-close',
+                            },
+                        },
+                    });
+                }, 2000);
+        }
+
+
     } // END if (message.data.type === 'event:event') {
 
     // Ultra has responded to our request to open a new panel...
@@ -212,13 +241,24 @@ function onMessageFromUltra(message) {
  * and specifies the events we want to listen for
  */
 function onAuthorizedWithUltra() {
-    console.log('TUTORIAL successful authorization')
-    console.log('window.location.origin:', window.location.origin)
+    console.log('TUTORIAL successful authorization');
+    console.log('window.location.origin:', window.location.origin);
+    console.log('integrationHost:', integrationHost);
+    console.log('iconUrl:' + integrationHost + '/static/blackboard-inc-logo-png-transparent-png.png');
 
     // PROCTORING - register our LTI Tool with the UEF.
     messageChannel.postMessage({
         type: 'proctoring-service:register',
         proctoringPlacementHandle: 'f74b87c285bb452685566123cb936b07'
+    });
+
+    // HELP
+    messageChannel.postMessage({
+        type: 'help:register',
+        id: 'tutorial-help',
+        displayName: 'Tutorial Help',
+        providerType: 'auxiliary',
+        iconUrl: integrationHost + '/static/tut.png'
     });
 
     messageChannel.postMessage({
