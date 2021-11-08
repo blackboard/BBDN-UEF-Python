@@ -94,6 +94,9 @@ function onMessageFromUltra(message) {
       onAuthorizedWithUltra();
     }
 
+    console.log('UEF TUTORIAL got message.data.type from Ultra:', message.data.type);
+    console.log('UEF TUTORIAL got message.data.selector from Ultra:', message.data.selector);
+
     // PROCTORING: Check if our proctoring service registration was recieved.
     if (message.data.type === 'proctoring-service:register') {
         console.log('UEF TUTORIAL got proctoring-service:register message.')
@@ -161,7 +164,7 @@ function onMessageFromUltra(message) {
                         children: `Proctoring Service Settings`
                     }, {
                         tag: 'div',
-                        children:  `CourseID: ${message.data.selectorData.contentId}`
+                        children:  `courseUuid: ${message.data.selectorData.courseUuid}, contentId: ${message.data.selectorData.contentId}`
                     }]
                 };
         
@@ -284,7 +287,8 @@ class LoggedMessageChannel {
     }
   
     onMessage = (evt) => {
-        console.log(`[UEF TUTORIAL] From Learn Ultra:`, evt.data);
+        console.log(`[UEF TUTORIAL] From Learn Ultra - evt:`, evt);
+        console.log(`[UEF TUTORIAL] From Learn Ultra - evt.data:`, evt.data);
         this.onmessage(evt);
     };
   
