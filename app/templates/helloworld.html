@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UEF HelloWorld</title>
+  <title>UEF Hello Localstorage!</title>
 </head>
 <body>
   <link rel="stylesheet" href="/static/style.css">
@@ -14,7 +14,22 @@
     </header>
     <hr />
     <p>
-      Welcome to the Ultra Extension Framework Python demo!
+      <!-- MBK LOCALSTORAGE Ref: https://www.tiny.cloud/blog/javascript-localstorage/ -->
+      <h1>JavaScript localStorage demo</h1>
+      <textarea id="myTextarea" rows="1" cols="25"></textarea>
+      <p></p>
+      <button onclick="mySave()">Save</button>
+      <button onclick="myLoad()">Load</button>
     </p>
+    <script>
+      function mySave() {
+        var myContent = document.getElementById("myTextarea").value;
+        localStorage.setItem("myContent", myContent);
+      }
+      function myLoad() {
+        var myContent = localStorage.getItem("myContent");
+        document.getElementById("myTextarea").value = myContent;
+      }
+    </script>
 </body>
 </html>
