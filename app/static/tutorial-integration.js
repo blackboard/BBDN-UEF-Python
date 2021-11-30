@@ -61,10 +61,14 @@ function onPostMessageReceived(evt) {
 
     // If Ultra is responding to our hello message
     if (evt.data.type === 'integration:hello') {
+        // Clear Any Local Storage from Last Usage. This is how we get around noticing the user logged out to clear local storage.
+        // We clear it when they log in!
 
         //Create a logged message channel so messages are logged to the Javascript console
         messageChannel = new LoggedMessageChannel(evt.ports[0]);
         messageChannel.onmessage = onMessageFromUltra;
+
+        localStorage.clear(); // MBK LOCALSTORAGE
   
         // Ultra is listening. Authorize ourselves using the REST token we received from 3LO
         // token is a variable set in index.html
@@ -110,6 +114,7 @@ function onMessageFromUltra(message) {
     if (message.data.type === 'event:event') {
         console.log('[UEF TUTORIAL] got event')
         console.log('[UEF TUTORIAL] (route?) message.data.eventType:', message.data.eventType)
+
         // From here, you can do something with those events. Let's check for a click..
         if(message.data.eventType === 'route') {
             // Added this logging because UEF has added/changed routeName for user action in the past.
@@ -123,37 +128,50 @@ function onMessageFromUltra(message) {
             ) {                                 
                 console.log('[UEF TUTORIAL] message.data.routeData.courseId:', message.data.routeData.courseId)
                 console.log('[UEF TUTORIAL] message.data.routeData.id:',message.data.routeData.id)
-                if(message.data.routeData.courseId === course_id && message.data.routeData.id === content_id) {
-                    
-                    // So let's ask Ultra to open a panel
-                    setTimeout(() => {
-                        messageChannel.postMessage({
-                            type: 'portal:panel',
-                            correlationId: 'panel-1',
-                            panelType: 'small',
-                            panelTitle: 'Hello World',
-                            attributes: {
-                                onClose: {
-                                    callbackId: 'panel-1-close',
-                                },
-                                onClick: {
-                                    callbackId: 'panel-1-close',
-                                },
-                            },
-                        });
-                    }, 2000);
-                }
+                
+                if (message.data.routeData.courseId === course_id) {
+                    // You might think you need insert code here to ask Ultra to open a Course Banner
+                    // You don't. When an Ultra course is opened, Ultra will always send us an event with course.banner.top  
 
+                    if(message.data.routeData.id === content_id) {
+                        
+                        // So let's ask Ultra to open a panel
+                        setTimeout(() => {
+                            messageChannel.postMessage({
+                                type: 'portal:panel',
+                                correlationId: 'panel-1',
+                                panelType: 'small',
+                                panelTitle: 'Hello World',
+                                attributes: {
+                                    onClose: {
+                                        callbackId: 'panel-1-close',
+                                    },
+                                    onClick: {
+                                        callbackId: 'panel-1-close',
+                                    },
+                                },
+                            });
+                        }, 2000);
+                    } // routeData.id matched our content_id
+
+                } // routeData.courseId matched our courseId  
+                
             }
 
         } // END if(message.data.eventType === 'route') {
 
-        // PROCTORING: The event type is a new portal. Proctoring data is shown in a "portal"
+        // PROCTORING && COURSE BANNERS: The event type is a new portal. Proctoring data is shown in a "portal" so is the Course Banner
         if (message.data.eventType === 'portal:new') {
             
+            // Check if this matches a course banner selector
+            if (message.data.selector === 'course.banner.top'){
+                console.log('[UEF TUTORIAL COURSE BANNER] Got a portal:new for a course.banner.top selector.');
+                showBanner(message.data.portalId);
+            }// end this matches a course banner selector
+
             // Check if this matches the proctoring panel selector
             if (message.data.selector === 'course.content.assessment.settings.proctoring.panel.settings') {
-                
+                console.log('[UEF TUTORIAL PROCTORING] Got a portal:new with a course.content.assessment.settings.proctoring.panel.settings');
                 // ID of this portal. This must be sent back to UEF in the portal:render message
                 const portalId = message.data.portalId;
                     
@@ -236,6 +254,34 @@ function onMessageFromUltra(message) {
 
 }
 
+// Shows the Course Banner
+function showBanner (portalId) {
+ 	messageChannel.postMessage({
+		type: 'portal:render',
+		portalId: portalId,
+		contents: {
+			tag: 'div',
+			props: {
+				style: {
+					backgroundColor: '#c56fd5'
+				}
+			},
+			children: [
+				{
+					tag: 'iframe',
+					props: {
+						src: banner_url,
+						style: {
+							flex: '1 1 auto',
+							width: '100%',
+						}
+					}
+				}
+			]
+		}
+	});
+}
+
 /*
  * Called upon successful authorization. This registers our application as a listener with Ultra
  * and specifies the events we want to listen for
@@ -273,14 +319,14 @@ function onAuthorizedWithUltra() {
  */
 function renderPanelContents(message) {
     
-    // Is this our panel??
+    // Is this our peek panel??
     if (message.data.correlationId === 'panel-1') {
         
         // let's get our panel ID
         panelId = message.data.portalId;
       
         // Now we will tell Ultra we want to render our content in the iframe they opened for us.
-        // panel_url is set in index.html
+        // panel_url is set IN index.html
         messageChannel.postMessage({
             type: 'portal:render',
             portalId: message.data.portalId,
@@ -310,7 +356,44 @@ function renderPanelContents(message) {
 
     }
 
-}
+    // Is this our course panel??
+    if (message.data.correlationId === 'panel-2') {
+        
+        // let's get our panel ID
+        panelId = message.data.portalId;
+      
+        // Now we will tell Ultra we want to render our content in the iframe they opened for us.
+        // panel_url is set IN index.html
+        messageChannel.postMessage({
+            type: 'portal:render',
+            portalId: message.data.portalId,
+            contents: {
+                tag: 'span',
+                props: {
+                    style: {
+                        display: 'flex',
+                        height: '100%',
+                        width: '100%',
+                        flexDirection: 'column',
+                        alignItems: 'stretch',
+                        justifyContent: 'stretch',
+                    },
+                },
+                children: [{
+                    tag: 'iframe',
+                    props: {
+                        style: {
+                            flex: '1 1 auto',
+                        },
+                        src: panel_url,
+                    },
+                }]
+            },
+        });
+
+    } // course panel
+
+} // function renderPanelContents
 
 /**
  * A MessageChannel-compatible API, but with console logging.

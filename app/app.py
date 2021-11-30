@@ -228,6 +228,7 @@ def authcode():
         'learn_url' : 'https://' + Config.config['learn_rest_url'],
         'token' : token,
         'panel_url' : Config.config['app_url'] + '/helloworld/',
+        'banner_url' : Config.config['app_url'] + '/banner/',
         'course_id' : '_6_1',
         'content_id' : '_25_1'
     }
@@ -238,6 +239,11 @@ def authcode():
 @login_required
 def sayhello():
     return render_template('helloworld.html')
+
+@app.route('/banner/', methods=['GET', 'POST'])
+@login_required
+def show_banner():
+    return render_template('banner.html')
 
 if __name__ == '__main__':
     restAuthController = None
