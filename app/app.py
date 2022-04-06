@@ -5,6 +5,7 @@ import uuid
 import urllib
 import webbrowser
 import json
+import sys
 
 from distutils import util
 
@@ -151,6 +152,7 @@ def get_jwks():
 
 @app.route('/login/', methods=['GET', 'POST'])
 def login():
+    print("***** in /login/", flush=True)
     tool_conf = ToolConfJsonFile(get_lti_config_path())
     launch_data_storage = get_launch_data_storage()
 
@@ -159,10 +161,12 @@ def login():
     
     if not target_link_uri:
         raise Exception('Missing "target_link_uri" param')
+    print("***** target_link_uri:"+target_link_uri, flush=True)
 
     oidc_login = FlaskOIDCLogin(flask_request, tool_conf, launch_data_storage=launch_data_storage)
+    print("***** exit /login/", flush=True)
     return oidc_login\
-        .enable_check_cookies()\
+        .disable_check_cookies()\
         .redirect(target_link_uri)
 
 
@@ -173,7 +177,9 @@ def launch():
     launch_data_storage = get_launch_data_storage()
     message_launch = ExtendedFlaskMessageLaunch(flask_request, tool_conf, launch_data_storage=launch_data_storage)
     message_launch_data = message_launch.get_launch_data()
+    print("***** /launch/ message_launch_data:")
     pprint.pprint(message_launch_data)
+    sys.stdout.flush()
     tpl_kwargs = {
         'page_title': PAGE_TITLE,
         'is_deep_link_launch': message_launch.is_deep_link_launch(),
@@ -205,7 +211,7 @@ def launch():
 
     get_authcode_url = learn_url + '/learn/api/public/v1/oauth2/authorizationcode?' + encodedParams
 
-    print("authcode_URL: " + get_authcode_url)
+    print("***** authcode_URL: " + get_authcode_url, flush=True)
 
     return(redirect(get_authcode_url))
 
@@ -214,14 +220,17 @@ def authcode():
     
     authcode = request.args.get('code', '')
     state = request.args.get('state', '')
-    print (authcode)
+    print ("***** /authcode/ authcode: "+ authcode, flush=True)
     
     restAuthController = RestAuthController.RestAuthController(authcode)
     restAuthController.setToken()
     token = restAuthController.getToken()
     uuid = restAuthController.getUuid()
 
+    print("***** calling login_user", flush=True)
     login_user(User(uuid))
+
+    print("***** back from login_user", flush=True)
 
     tp_kwargs = {
         'title' : PAGE_TITLE,
@@ -229,7 +238,7 @@ def authcode():
         'token' : token,
         'panel_url' : Config.config['app_url'] + '/helloworld/',
         'course_id' : '_6_1',
-        'content_id' : '_25_1'
+        'content_id' : '_26_1'
     }
 
     return render_template('index.html', **tp_kwargs)
