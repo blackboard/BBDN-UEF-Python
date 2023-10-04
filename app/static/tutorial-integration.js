@@ -160,6 +160,11 @@ function onMessageFromUltra(message) {
 
         } // END if(message.data.eventType === 'route') {
 
+        // COURSE-LEFTNAV course details. When we get the new portal with course outline details, show our version.
+        if (message.data.eventType === 'portal:new' && message.data.selector === 'course.outline.details') {
+            showCourseDetails(message.data.portalId, 'UEF cod Test', 'Click Here');
+        }
+
         // PROCTORING && COURSE BANNERS: The event type is a new portal. Proctoring data is shown in a "portal" so is the Course Banner
         if (message.data.eventType === 'portal:new') {
             
@@ -254,6 +259,82 @@ function onMessageFromUltra(message) {
 
 }
 
+// Shows the link in course details COURSE-LEFTNAV.
+// Notice the onClick will call back to our code.
+function showCourseDetails (portalId, titleName, linkName) {
+    messageChannel.postMessage({
+        type: 'portal:render',
+        portalId: portalId,
+        contents: {
+            tag: 'div',
+            props: {
+                className: 'uef--course-details--container',
+            },
+            children: [
+                {
+                    tag: 'button',
+                    props: {
+                        className: 'uef--button--course-details',
+                        onClick: {
+                            callbackId: 'course-details-test',
+                            mode: 'sync',
+                        }
+                    },
+                    children: [
+                        {
+                            tag: 'div',
+                            props: {
+                                className: 'uef--course-details--image'
+                            },
+                            children: [
+                                {
+                                    tag: 'img',
+                                    props: {
+                                        alt: 'Batman logo',
+                                        src: 'https://img.icons8.com/material-sharp/1x/batman-emoji.png',
+                                        height: 24,
+                                        width: 24
+                                    },
+                                }
+                            ]
+                        },
+                        {
+                            tag: 'div',
+                            props: {
+                                className: 'uef--course-details--element'
+                            },
+                            children: [
+                                {
+                                    tag: 'div',
+                                    props: {
+                                        className: 'uef--course-details--name'
+                                    },
+                                    children: titleName
+                                },
+                                {
+                                    tag: 'div',
+                                    props: {
+                                        className: 'uef--course-details--content'
+                                    },
+                                    children: [
+                                        {
+                                            tag: 'div',
+                                            props: {
+                                                className: 'uef--course-details--link'
+                                            },
+                                            children: linkName
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    });
+} // end show course details
+
 // Shows the Course Banner
 function showBanner (portalId) {
  	messageChannel.postMessage({
@@ -310,6 +391,12 @@ function onAuthorizedWithUltra() {
     messageChannel.postMessage({
         type: 'event:subscribe',
         subscriptions: ['click','hover','route','portal:new','portal:remove'],
+    });
+
+    //COURSE-LEFTNAV course detail - register to get the course:detail opening
+    messageChannel.postMessage({
+        type: "course:detail:register",
+        registrationName: 'UEF course:detail Test',
     });
 
 }
