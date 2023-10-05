@@ -32,6 +32,12 @@ if (!window.parent) {
     throw new Error('Not within iframe');
 }
 
+const launchUrl = window.__launchUrl;
+const uuid = window.__uuid;
+const learnUrl = window.__lmsHost;
+const locale = window.__locale;
+const assetsUrl = window.__assetsUrl;
+
 /* Initialize messageChannel */
 let messageChannel;
 
@@ -239,6 +245,16 @@ function onMessageFromUltra(message) {
     
     }
 
+    // COURSE-LEFTNAV
+    // Our link was clicked. We get a callback and tell Ultra to open our course details panel
+    if (message.data.type === 'portal:callback') {
+        switch(message.data.callbackId) {
+            case 'course-details-test':
+                openPanelCD('full', localStorage.getItem('context'));
+                break;
+        }
+    }
+
     // PROCTORING: TODO: Add code to save off our settings...
     if (message.data.type === 'proctoring-service:settings-saved') {
         // Settings were saved for this contentId
@@ -259,7 +275,26 @@ function onMessageFromUltra(message) {
 
 }
 
-// Shows the link in course details COURSE-LEFTNAV.
+// COURSE-LEFTNAV tell Ultra to open our panel. It will send us a message back after
+// it does. Then we render some content there in panel-3
+function openPanelCD(panelSize, data) {
+    localStorage.setItem('context', data);
+    localStorage.setItem('action', 'SHOW_PANEL');
+
+    messageChannel.postMessage({
+        type: 'portal:panel',
+        correlationId: 'panel-3',
+        panelType: panelSize,
+        panelTitle: 'UEF Courses Details Demo',
+        attributes: {
+            onClose: {
+                callbackId: 'panel-3-close',
+            },
+        },
+    });
+}
+
+// COURSE-LEFTNAV Shows the link in course details.
 // Notice the onClick will call back to our code.
 function showCourseDetails (portalId, titleName, linkName) {
     messageChannel.postMessage({
@@ -413,7 +448,7 @@ function renderPanelContents(message) {
         panelId = message.data.portalId;
       
         // Now we will tell Ultra we want to render our content in the iframe they opened for us.
-        // panel_url is set IN index.html
+        // panel_url is set IN index.html. This one does the helloworld.html template, set in tp_kwargs in app.py
         messageChannel.postMessage({
             type: 'portal:render',
             portalId: message.data.portalId,
@@ -479,6 +514,39 @@ function renderPanelContents(message) {
         });
 
     } // course panel
+
+    // COURSE-LEFTNAV - Panel resulting from clicking on the link in the left nav.
+    if (message.data.correlationId === 'panel-3') {
+        var launchUrl2 = launchUrl + '?data=' + encodeURIComponent(localStorage.getItem('context')) + "&uuid=" + uuid + "&action=" + localStorage.getItem('action') + "&learn_url=" + learnUrl + "&locale=" + locale;
+        panelId = message.data.portalId;
+        messageChannel.postMessage({
+            type: 'portal:render',
+            portalId: message.data.portalId,
+            contents: {
+                tag: 'span',
+                props: {
+                    style: {
+                        display: 'flex',
+                        height: '100%',
+                        width: '100%',
+                        flexDirection: 'column',
+                        alignItems: 'stretch',
+                        justifyContent: 'stretch',
+                    },
+                },
+                children: [{
+                    tag: 'iframe',
+                    props: {
+                        style: {
+                            flex: '1 1 auto',
+                        },
+                        src: launchUrl2,
+                    },
+                }]
+            },
+        });
+    } // END - // COURSE-LEFTNAV - Panel resulting from clicking on the link in the left nav.
+
 
 } // function renderPanelContents
 
