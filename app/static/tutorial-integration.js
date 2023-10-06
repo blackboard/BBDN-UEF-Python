@@ -32,11 +32,7 @@ if (!window.parent) {
     throw new Error('Not within iframe');
 }
 
-const launchUrl = window.__launchUrl;
-const uuid = window.__uuid;
-const learnUrl = window.__lmsHost;
-const locale = window.__locale;
-const assetsUrl = window.__assetsUrl;
+
 
 /* Initialize messageChannel */
 let messageChannel;
@@ -516,35 +512,34 @@ function renderPanelContents(message) {
     } // course panel
 
     // COURSE-LEFTNAV - Panel resulting from clicking on the link in the left nav.
+    // You MUST change the handle: value to match that of your LTI managed placment handle.
+    // In summary the panel got opened so we put the contents of an LTI launch within.
     if (message.data.correlationId === 'panel-3') {
-        var launchUrl2 = launchUrl + '?data=' + encodeURIComponent(localStorage.getItem('context')) + "&uuid=" + uuid + "&action=" + localStorage.getItem('action') + "&learn_url=" + learnUrl + "&locale=" + locale;
+
         panelId = message.data.portalId;
+        
+        const contentsToSendLti = {
+            tag: 'LtiLaunch',
+            props: {
+              handle: 'ce9718549a1d4151b62e9fdfeff15dff',
+              customParameters: JSON.stringify({
+                'keya': 'foo',
+                'keyb': 'bar',
+                'keyc': 'baz'
+              }),
+              style: {
+                width: '75%',
+                height: '75%',
+              },
+            }
+        }
+
         messageChannel.postMessage({
             type: 'portal:render',
             portalId: message.data.portalId,
-            contents: {
-                tag: 'span',
-                props: {
-                    style: {
-                        display: 'flex',
-                        height: '100%',
-                        width: '100%',
-                        flexDirection: 'column',
-                        alignItems: 'stretch',
-                        justifyContent: 'stretch',
-                    },
-                },
-                children: [{
-                    tag: 'iframe',
-                    props: {
-                        style: {
-                            flex: '1 1 auto',
-                        },
-                        src: launchUrl2,
-                    },
-                }]
-            },
+            contents: contentsToSendLti
         });
+
     } // END - // COURSE-LEFTNAV - Panel resulting from clicking on the link in the left nav.
 
 
