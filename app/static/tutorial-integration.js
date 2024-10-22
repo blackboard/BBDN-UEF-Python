@@ -394,6 +394,49 @@ function showBanner (portalId) {
 	});
 }
 
+function showBaseNav (linkName) {
+    return {
+        tag: 'ButtonLink',
+        props: {
+            style: {
+                'minHeight': '52px',
+                'display': 'flex',
+                'flexDirection': 'row',
+                'justifyContent': 'flex-start',
+                'alignItems': 'center',
+                'width': '100%',
+                'paddingLeft': '12px',
+            },
+            to: 'uefTest',
+            className: 'uef--base-nav-button',
+        },
+        children: [
+            {
+                tag: 'SvgIcon',
+                props: {
+                    className: 'svg-icon medium-icon default',
+                    style: {
+                        display: 'inline-block',
+                        left: '12px',
+                        fontSize: '18px',
+                        lineHeight: '1.1',
+                        marginRight: '14px',
+                        textAlign: 'center',
+                        verticalAlign: 'middle',
+                    },
+                    height: '24px',
+                    width: '24px',
+                    url: 'https://img.icons8.com/material-sharp/1x/batman-emoji.png',
+                }
+            },
+            {
+                tag: 'span',
+                children: linkName,
+            }
+        ],
+    }
+}
+
 /*
  * Called upon successful authorization. This registers our application as a listener with Ultra
  * and specifies the events we want to listen for
@@ -428,6 +471,14 @@ function onAuthorizedWithUltra() {
     messageChannel.postMessage({
         type: "course:detail:register",
         registrationName: 'UEF course:detail Test',
+    });
+
+    //UEF-BASENAV - register to get the UEF Base Navigation opening.
+    messageChannel.postMessage({
+        type: "basenav:register",
+        routeName: 'uefTest',
+        displayName: 'UEF basenave:register Test',
+        initialContents: showBaseNav('UEF basenav:register Test'),
     });
 
 }
