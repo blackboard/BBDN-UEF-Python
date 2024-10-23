@@ -162,6 +162,14 @@ function onMessageFromUltra(message) {
 
         } // END if(message.data.eventType === 'route') {
 
+        // ULTRA-BASENAV 
+        if (message.data.eventType === 'portal:new' && message.data.selector === 'base.integration' && message.data.selectorData.routeName === 'uefTest') {
+            localStorage.setItem('action', 'LOAD_BASENAV');
+            localStorage.setItem('context', msg.data.selectorData.routeParameters);
+            renderBaseNavContents(message);
+        }
+
+
         // COURSE-LEFTNAV course details. When we get the new portal with course outline details, show our version.
         if (message.data.eventType === 'portal:new' && message.data.selector === 'course.outline.details') {
             showCourseDetails(message.data.portalId, 'UEF cod Test', 'Click Here');
@@ -248,6 +256,9 @@ function onMessageFromUltra(message) {
             case 'course-details-test':
                 openPanelCD('full', localStorage.getItem('context'));
                 break;
+            case 'uef-basenav-test':
+                openPanelBN('full', localStorage.getItem('context'));
+                break;
         }
     }
 
@@ -270,6 +281,39 @@ function onMessageFromUltra(message) {
      }
 
 }
+
+// ULTRA-BASENAV tell ultra to open our panel.
+function renderBaseNavContents(message) {
+    // var launchUrl2 = launchUrl + '?data=' + encodeURIComponent(localStorage.getItem('context')) + "&uuid=" + uuid + "&action=" + localStorage.getItem('action') + "&learn_url=" + learnUrl + "&locale=" + locale;
+    panelId = message.data.portalId;
+    messageChannel.postMessage({
+        type: 'portal:render',
+        portalId: message.data.portalId,
+        contents: {
+            tag: 'span',
+            props: {
+                style: {
+                    display: 'flex',
+                    height: '100%',
+                    width: '100%',
+                    flexDirection: 'column',
+                    alignItems: 'stretch',
+                    justifyContent: 'stretch',
+                },
+            },
+            children: [{
+                tag: 'iframe',
+                props: {
+                    style: {
+                        flex: '1 1 auto',
+                    },
+                    src: "HELLO WORLD",
+                },
+            }]
+        },
+    });
+}
+
 
 // COURSE-LEFTNAV tell Ultra to open our panel. It will send us a message back after
 // it does. Then we render some content there in panel-3
@@ -394,9 +438,28 @@ function showBanner (portalId) {
 	});
 }
 
+// UEF-BASENAV tell Ultra to open our panel. It will send us a message back after
+// it does. Then we render some content there in panel-4
+function openPanelBN(panelSize, data) {
+    localStorage.setItem('context', data);
+    localStorage.setItem('action', 'SHOW_PANEL');
+
+    messageChannel.postMessage({
+        type: 'portal:panel',
+        correlationId: 'panel-4',
+        panelType: panelSize,
+        panelTitle: 'UEF Basenav Demo',
+        attributes: {
+            onClose: {
+                callbackId: 'panel-4-close',
+            },
+        },
+    });
+}
+
 function showBaseNav (linkName) {
     return {
-        tag: 'ButtonLink',
+        tag: 'button',
         props: {
             style: {
                 'minHeight': '52px',
@@ -407,7 +470,10 @@ function showBaseNav (linkName) {
                 'width': '100%',
                 'paddingLeft': '12px',
             },
-            to: 'uefTest',
+            onClick: {
+                callbackId: 'uef-basenav-test',
+                mode: 'sync',
+            },
             className: 'uef--base-nav-button',
         },
         children: [
@@ -562,6 +628,39 @@ function renderPanelContents(message) {
 
     } // course panel
 
+    // UEF-BASENAV - Panel resulting from clicking on the link in the left nav.
+    // You MUST change the handle: value to match that of your LTI managed placment handle.
+    // Your LTI managed placement handle MUST be a system tool as there is no course context.
+    // In summary the panel got opened so we put the contents of an LTI launch within.
+    if (message.data.correlationId === 'panel-4') {
+
+        panelId = message.data.portalId;
+        
+        const contentsToSendLti = {
+            tag: 'LtiLaunch',
+            props: {
+              handle: 'f48bc2f43c224b8e826ef5ea863a017a',
+              customParameters: JSON.stringify({
+                'keya': 'foo',
+                'keyb': 'bar',
+                'keyc': 'baz'
+              }),
+              style: {
+                width: '75%',
+                height: '75%',
+              },
+            }
+        }
+
+        messageChannel.postMessage({
+            type: 'portal:render',
+            portalId: message.data.portalId,
+            contents: contentsToSendLti
+        });
+
+    } // END - // UEF-BASENAV - Panel resulting from clicking on the link in the ultra base left nav.
+
+    
     // COURSE-LEFTNAV - Panel resulting from clicking on the link in the left nav.
     // You MUST change the handle: value to match that of your LTI managed placment handle.
     // In summary the panel got opened so we put the contents of an LTI launch within.
