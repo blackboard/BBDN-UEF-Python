@@ -162,14 +162,6 @@ function onMessageFromUltra(message) {
 
         } // END if(message.data.eventType === 'route') {
 
-        // ULTRA-BASENAV 
-        if (message.data.eventType === 'portal:new' && message.data.selector === 'base.integration' && message.data.selectorData.routeName === 'uefTest') {
-            localStorage.setItem('action', 'LOAD_BASENAV');
-            localStorage.setItem('context', msg.data.selectorData.routeParameters);
-            renderBaseNavContents(message);
-        }
-
-
         // COURSE-LEFTNAV course details. When we get the new portal with course outline details, show our version.
         if (message.data.eventType === 'portal:new' && message.data.selector === 'course.outline.details') {
             showCourseDetails(message.data.portalId, 'UEF cod Test', 'Click Here');
@@ -281,39 +273,6 @@ function onMessageFromUltra(message) {
      }
 
 }
-
-// ULTRA-BASENAV tell ultra to open our panel.
-function renderBaseNavContents(message) {
-    // var launchUrl2 = launchUrl + '?data=' + encodeURIComponent(localStorage.getItem('context')) + "&uuid=" + uuid + "&action=" + localStorage.getItem('action') + "&learn_url=" + learnUrl + "&locale=" + locale;
-    panelId = message.data.portalId;
-    messageChannel.postMessage({
-        type: 'portal:render',
-        portalId: message.data.portalId,
-        contents: {
-            tag: 'span',
-            props: {
-                style: {
-                    display: 'flex',
-                    height: '100%',
-                    width: '100%',
-                    flexDirection: 'column',
-                    alignItems: 'stretch',
-                    justifyContent: 'stretch',
-                },
-            },
-            children: [{
-                tag: 'iframe',
-                props: {
-                    style: {
-                        flex: '1 1 auto',
-                    },
-                    src: "HELLO WORLD",
-                },
-            }]
-        },
-    });
-}
-
 
 // COURSE-LEFTNAV tell Ultra to open our panel. It will send us a message back after
 // it does. Then we render some content there in panel-3
